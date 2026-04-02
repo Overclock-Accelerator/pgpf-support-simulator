@@ -36,14 +36,14 @@ export default function TabBar({
   }
 
   return (
-    <div className="flex items-center border-b border-amber-100 bg-white/60 overflow-x-auto flex-shrink-0">
+    <div className="flex items-center border-b border-gray-200/60 bg-white overflow-x-auto flex-shrink-0">
       {tabs.map((tab) => (
         <div
           key={tab.id}
-          className={`flex items-center gap-1 px-3 py-2 cursor-pointer text-sm whitespace-nowrap border-b-2 transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 cursor-pointer text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
             tab.id === activeTabId
-              ? 'border-amber-500 text-amber-700 bg-amber-50'
-              : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ? 'border-amber-500 text-amber-700 bg-amber-50/50'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
           }`}
           onClick={() => onTabChange(tab.id)}
           onDoubleClick={() => startEditing(tab)}
@@ -80,7 +80,7 @@ export default function TabBar({
         </div>
       ))}
       <button
-        className="px-3 py-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 transition-colors text-lg leading-none font-light border-b-2 border-transparent"
+        className="px-3 py-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors text-sm leading-none font-medium border-b-2 border-transparent"
         onClick={onAddTab}
         title="Add new tab"
       >

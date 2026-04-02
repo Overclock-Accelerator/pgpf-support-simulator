@@ -80,24 +80,21 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white/80 flex-shrink-0">
-        <div>
-          <p className="font-bold text-gray-800">🐾 PrettyGoodPetFoods Support</p>
-          <p className="text-xs text-gray-400 italic">"If they ate it. It must have been pretty good!"</p>
-        </div>
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-white flex-shrink-0">
+        <p className="font-semibold text-gray-700 text-sm">Chat</p>
         {!tab.isBaseCase && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleNewChat}
-              className="text-xs text-gray-500 hover:text-amber-600 border border-gray-200 hover:border-amber-300 rounded px-2 py-1 transition-colors"
+              className="text-xs text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg px-2.5 py-1.5 transition-colors"
             >
-              New Chat 🔄
+              Clear
             </button>
             <button
               onClick={handleExport}
-              className="text-xs text-gray-500 hover:text-amber-600 border border-gray-200 hover:border-amber-300 rounded px-2 py-1 transition-colors"
+              className="text-xs text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg px-2.5 py-1.5 transition-colors"
             >
-              Export 💾
+              Export
             </button>
           </div>
         )}
@@ -120,10 +117,10 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
         {tab.messages.map((msg: Message) => (
           <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
             <div
-              className={`max-w-[80%] px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
+              className={`max-w-[85%] sm:max-w-[75%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-amber-100 border border-amber-200 text-gray-800'
-                  : 'bg-white border border-gray-200 shadow-sm text-gray-800'
+                  ? 'bg-amber-500 text-white rounded-br-md'
+                  : 'bg-white border border-gray-200 shadow-sm text-gray-700 rounded-bl-md'
               }`}
             >
               {msg.content}
@@ -149,29 +146,31 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
 
       {/* Input */}
       {!tab.isBaseCase && (
-        <div className="flex-shrink-0 border-t border-gray-100 bg-white/80 px-4 py-3">
+        <div className="flex-shrink-0 border-t border-gray-100 bg-white px-3 sm:px-4 py-3">
           <div className="flex items-end gap-2">
             <textarea
               ref={textareaRef}
               value={input}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              placeholder="Type a customer message... 🐾"
+              placeholder="Type a customer message..."
               rows={1}
               disabled={isLoading}
-              className="flex-1 border border-amber-200 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-50 overflow-hidden"
-              style={{ minHeight: '40px', maxHeight: '96px' }}
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300 disabled:opacity-50 overflow-hidden transition-all"
+              style={{ minHeight: '42px', maxHeight: '96px' }}
             />
             <button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2 text-sm font-semibold transition-colors flex items-center gap-1 flex-shrink-0"
-              style={{ minHeight: '40px' }}
+              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors flex items-center gap-1 flex-shrink-0"
+              style={{ minHeight: '42px' }}
             >
               {isLoading ? (
                 <span className="inline-block animate-spin">⟳</span>
               ) : (
-                'Send'
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
               )}
             </button>
           </div>

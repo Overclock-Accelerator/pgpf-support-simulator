@@ -28,6 +28,7 @@ export default function SimulatorPage() {
   const [activeTabId, setActiveTabId] = useState<string>('base-case')
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [configOpen, setConfigOpen] = useState(false)
 
   // Auth check + load from localStorage
   useEffect(() => {
@@ -186,17 +187,29 @@ export default function SimulatorPage() {
 
   return (
     <div className="h-screen flex flex-col bg-[#FDFAF5]">
-      <header className="h-[60px] border-b border-amber-200 bg-white/80 flex items-center justify-between px-4 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🐾</span>
-          <span className="font-bold text-amber-700">PrettyGoodPetFoods</span>
-          <span className="text-sm text-gray-400 ml-1">Support Simulator</span>
+      {/* Header */}
+      <header className="h-[56px] border-b border-gray-200/60 bg-white flex items-center justify-between px-4 flex-shrink-0 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <img src="/hero.png" alt="Pet crew" className="h-8 w-8 rounded-lg object-cover" />
+          <div>
+            <span className="font-bold text-gray-800 text-sm">PrettyGoodPetFoods</span>
+            <span className="text-xs text-gray-400 ml-1.5 hidden sm:inline">Support Simulator</span>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <img src="/hero.png" alt="Pet crew" className="h-10 object-contain" />
-          <span className="text-xs italic text-gray-500 hidden sm:block">
+        <div className="flex items-center gap-2">
+          <span className="text-xs italic text-gray-400 hidden md:block">
             "If they ate it. It must have been pretty good!"
           </span>
+          {/* Mobile config toggle */}
+          <button
+            onClick={() => setConfigOpen((v) => !v)}
+            className="lg:hidden flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-amber-600 border border-gray-200 hover:border-amber-300 rounded-lg px-2.5 py-1.5 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Config
+          </button>
         </div>
       </header>
 
@@ -209,10 +222,37 @@ export default function SimulatorPage() {
         onRenameTab={renameTab}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-80 border-r border-amber-100 overflow-y-auto bg-white/60 flex-shrink-0">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Config panel — sidebar on desktop, overlay on mobile */}
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block w-80 border-r border-gray-200/60 overflow-y-auto bg-white/80 flex-shrink-0">
           <ConfigPanel tab={activeTab} onUpdateTab={updateTab} />
         </div>
+        {/* Mobile overlay */}
+        {configOpen && (
+          <>
+            <div
+              className="lg:hidden fixed inset-0 bg-black/20 z-30"
+              onClick={() => setConfigOpen(false)}
+            />
+            <div className="lg:hidden fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-white z-40 overflow-y-auto shadow-xl">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <span className="text-sm font-semibold text-gray-700">Configuration</span>
+                <button
+                  onClick={() => setConfigOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <ConfigPanel tab={activeTab} onUpdateTab={updateTab} />
+            </div>
+          </>
+        )}
+
+        {/* Chat area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <ChatPanel
             tab={activeTab}
