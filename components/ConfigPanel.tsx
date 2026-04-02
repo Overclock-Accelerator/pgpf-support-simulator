@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Tab } from '@/lib/types'
 import { BASE_CASE_SYSTEM_PROMPT } from '@/lib/base-case'
 import { COMPANY_CONTEXT } from '@/lib/company-context'
+import { MODELS } from '@/lib/models'
 import ModelSelector from './ModelSelector'
 
 interface ConfigPanelProps {
@@ -14,17 +15,44 @@ interface ConfigPanelProps {
 export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
   const [contextOpen, setContextOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(true)
+  const [modelOpen, setModelOpen] = useState(false)
+
+  const selectedModel = MODELS.find(m => m.id === tab.modelId)
 
   return (
     <div className="p-4 flex flex-col gap-5">
-      {/* Model Section */}
+      {/* Model Section — collapsible */}
       <section>
-        <h2 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Model</h2>
-        <ModelSelector
-          selectedModelId={tab.modelId}
-          onChange={(modelId) => onUpdateTab({ modelId })}
-          disabled={tab.isBaseCase}
-        />
+        <button
+          onClick={() => setModelOpen((v) => !v)}
+          className="flex items-center justify-between w-full text-left mb-2 group"
+        >
+          <div className="flex items-center gap-2">
+            <svg
+              className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${modelOpen ? 'rotate-90' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <h2 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider group-hover:text-amber-600 transition-colors">
+              Model
+            </h2>
+          </div>
+          {!modelOpen && selectedModel && (
+            <span className="text-xs text-gray-500 font-medium truncate ml-2">
+              {selectedModel.name}
+            </span>
+          )}
+        </button>
+        {modelOpen && (
+          <ModelSelector
+            selectedModelId={tab.modelId}
+            onChange={(modelId) => onUpdateTab({ modelId })}
+            disabled={tab.isBaseCase}
+          />
+        )}
       </section>
 
       {/* System Prompt Section — collapsible */}
