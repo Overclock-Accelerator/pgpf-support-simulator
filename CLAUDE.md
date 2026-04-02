@@ -8,7 +8,7 @@ An educational simulator built for the **Overclock AI Operations Accelerator** p
 
 ## The Exercise
 
-Students are told PrettyGoodPetFoods' customer support bot has been deployed to production and is failing badly. A locked **Base Case** tab shows 8 pre-loaded conversations demonstrating real failure modes: hallucinated pricing, wrong product recommendations, invented policies, competitor endorsement, off-topic responses, and ignored pet health emergencies.
+Students are told PrettyGoodPetFoods' customer support bot has been deployed to production and is failing badly. A locked **Base Case** tab shows one read-only benchmark transcript (many back-and-forth turns) covering pricing mistakes, bogus policy, returns, competitor blurts, order-change dead ends, dismissing loyal customers, bad subscription advice, fake delivery promises, wrong species picks, ignored health escalation, and off-topic replies.
 
 Students open new tabs and iterate on two levers:
 1. **System prompt** — rewrite the bot's instructions (tone, guardrails, context injection, conditional logic)

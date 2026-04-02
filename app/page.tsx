@@ -30,92 +30,109 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#FDFAF5] p-4">
-      <div className="w-full max-w-lg">
-        {/* Brand mark */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-amber-500 rounded-2xl mb-4 shadow-lg shadow-amber-200/60">
-            <span className="text-2xl">🐾</span>
+    <main className="min-h-screen flex items-center justify-center bg-swiss-paper bg-swiss-dots p-6">
+      <div className="w-full max-w-xl relative">
+        {/* Decorative orange circle — poster reference */}
+        <div
+          className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-swiss-orange/25 blur-2xl"
+          aria-hidden
+        />
+
+        <div className="text-center mb-10">
+          <p className="label-poster text-swiss-sage mb-3">Overclock · Unit 1</p>
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-swiss-orange text-white rounded-sm mb-5 shadow-lg">
+            <span className="text-3xl leading-none">🐾</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">PrettyGoodPetFoods</h1>
-          <p className="text-sm text-gray-400 italic mt-1">"If they ate it. It must have been pretty good!"</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-swiss-ink uppercase tracking-[0.12em] leading-tight">
+            PrettyGoodPetFoods
+          </h1>
+          <p className="text-base text-neutral-600 mt-3 max-w-md mx-auto leading-relaxed">
+            &ldquo;If they ate it... It must have been pretty good!&rdquo;
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          {/* What this tool does */}
-          <div className="bg-gradient-to-br from-amber-500 to-amber-600 px-6 py-5 text-white">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-semibold text-sm mb-1">AI Support Simulator</p>
-                <p className="text-xs leading-relaxed text-amber-100">
-                  Explore how <strong className="text-white">system prompts</strong>, <strong className="text-white">model selection</strong>, and <strong className="text-white">context documents</strong> change how an AI support bot responds — side-by-side with a broken base case.
-                </p>
-              </div>
-            </div>
+        <div className="bg-white border-2 border-swiss-ink shadow-[8px_8px_0_0_rgba(12,12,12,0.08)] overflow-hidden">
+          {/* Sky-blue bar + title — color block like poster */}
+          <div className="bg-swiss-blue px-6 py-6 text-white border-b-2 border-swiss-ink">
+            <p className="text-sm font-bold uppercase tracking-[0.25em] opacity-90 mb-2">Simulator</p>
+            <ol className="text-lg sm:text-xl font-semibold leading-snug list-none space-y-3 m-0 p-0">
+              <li className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 flex items-center justify-center border-2 border-white/80 text-sm font-black">1</span>
+                <span>
+                  Open <strong>Instructions</strong> for the full brief, then <strong>Base Case</strong> and read the scripted chat end to end.
+                  Hover (or focus) the dashed <span className="font-mono font-bold">?</span> beside bot replies for facilitator notes (not part of the chat).
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 flex items-center justify-center border-2 border-white/80 text-sm font-black">2</span>
+                <span>
+                  Open a <strong>Variation</strong> tab and optimize support—prompt, model, context—and experiment with personality so you&apos;d actually want to talk to the bot.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="shrink-0 w-7 h-7 flex items-center justify-center border-2 border-white/80 text-sm font-black">3</span>
+                <span>
+                  Add <strong>more variation tabs</strong> to compare setups side by side.
+                </span>
+              </li>
+            </ol>
           </div>
 
-          {/* Feature hints */}
-          <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x-2 divide-swiss-ink/10 border-b-2 border-swiss-ink/10">
             {[
-              { icon: '📝', label: 'Edit system prompts' },
-              { icon: '🤖', label: 'Swap AI models' },
-              { icon: '📊', label: 'Compare outcomes' },
-            ].map(({ icon, label }) => (
-              <div key={label} className="px-4 py-3 text-center">
-                <div className="text-lg mb-1">{icon}</div>
-                <p className="text-[11px] text-gray-500 font-medium leading-tight">{label}</p>
+              { icon: '📖', label: 'Instructions first', sub: 'Full exercise brief' },
+              { icon: '🔍', label: 'Base Case chat', sub: 'Thread + facilitator notes' },
+              { icon: '🧪', label: 'Variation tabs', sub: 'Prompt, model, context' },
+            ].map(({ icon, label, sub }) => (
+              <div key={label} className="px-5 py-4 text-center bg-swiss-beige/30">
+                <div className="text-2xl mb-2">{icon}</div>
+                <p className="text-sm font-bold uppercase tracking-widest text-swiss-ink">{label}</p>
+                <p className="text-xs text-neutral-600 mt-1.5 font-medium leading-snug">{sub}</p>
               </div>
             ))}
           </div>
 
-          {/* Form */}
-          <div className="px-6 py-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="px-6 py-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Simulator Passcode
+                <label className="block text-sm font-bold uppercase tracking-[0.2em] text-swiss-ink mb-2">
+                  Passcode
                 </label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError('') }}
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all placeholder:text-gray-400"
-                  placeholder="Enter passcode..."
+                  className="w-full border-2 border-neutral-300 rounded-sm px-4 py-3.5 text-base focus:outline-none focus:border-swiss-orange focus:ring-2 focus:ring-swiss-orange/20 transition-all placeholder:text-neutral-400"
+                  placeholder="Enter passcode"
                   autoFocus
                 />
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
-                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 text-swiss-crimson bg-red-50 border-2 border-swiss-crimson/30 rounded-sm px-4 py-3">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-xs">{error}</p>
+                  <p className="text-sm font-medium">{error}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading || !password}
-                className="w-full bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl px-6 py-3 transition-all text-sm flex items-center justify-center gap-2"
+                className="w-full bg-swiss-orange hover:bg-[#cf5204] disabled:opacity-45 disabled:cursor-not-allowed text-white font-bold uppercase tracking-[0.2em] text-sm py-4 transition-colors flex items-center justify-center gap-2 border-2 border-swiss-ink shadow-[4px_4px_0_0_rgba(12,12,12,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_rgba(12,12,12,1)]"
               >
                 {loading ? (
                   <>
-                    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Entering...
+                    Entering
                   </>
                 ) : (
                   <>
-                    Enter the Simulator
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    Enter simulator
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </>
@@ -125,8 +142,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-5">
-          Built for AI education · Powered by OpenRouter
+        <p className="text-center text-sm text-neutral-500 mt-6 font-medium uppercase tracking-widest">
+          AI education · OpenRouter
         </p>
       </div>
     </main>

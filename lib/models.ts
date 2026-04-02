@@ -27,7 +27,7 @@ export const MODELS: Model[] = [
 ]
 
 export const PROVIDER_ORDER = ['Anthropic', 'OpenAI', 'DeepSeek', 'Qwen', 'z.ai', 'Moonshot AI', 'xAI', 'MiniMax']
-export const BASE_CASE_MODEL_ID = 'anthropic/claude-haiku-4.5'
+export const BASE_CASE_MODEL_ID = 'anthropic/claude-opus-4.6'
 
 export function getModel(id: string): Model | undefined {
   return MODELS.find(m => m.id === id)

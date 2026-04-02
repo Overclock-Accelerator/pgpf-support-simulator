@@ -1,10 +1,13 @@
 import { NextRequest } from 'next/server'
-import { COMPANY_CONTEXT } from '@/lib/company-context'
+import { resolveContextForRequest } from '@/lib/company-context'
 
 export async function POST(req: NextRequest) {
-  const { messages, systemPrompt, modelId } = await req.json()
+  const { messages, systemPrompt, modelId, companyContext } = await req.json()
+  const contextDoc = resolveContextForRequest(
+    typeof companyContext === 'string' ? companyContext : undefined
+  )
 
-  const fullSystem = `${systemPrompt}\n\n---\nCOMPANY CONTEXT DOCUMENT (use this to answer customer questions accurately):\n${COMPANY_CONTEXT}`
+  const fullSystem = `${systemPrompt}\n\n---\nCOMPANY CONTEXT DOCUMENT (use this to answer customer questions accurately):\n${contextDoc}`
 
   const startTime = Date.now()
 

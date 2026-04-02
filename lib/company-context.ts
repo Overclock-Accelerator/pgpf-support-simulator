@@ -116,3 +116,10 @@ TONE & PERSONALITY GUIDELINES
 - Always validate the customer's pet by name if they share it.
 - The disgusted-face return policy is quirky and real — lean into it with good humor.
 `
+
+/** Context sent to the model: blank / undefined falls back to the default catalog. */
+export function resolveContextForRequest(companyContext: string | undefined): string {
+  if (companyContext === undefined) return COMPANY_CONTEXT
+  const t = companyContext.trim()
+  return t === '' ? COMPANY_CONTEXT : companyContext
+}
