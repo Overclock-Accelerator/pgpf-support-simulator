@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Tab, Message } from '@/lib/types'
 import { BASE_CASE_SYSTEM_PROMPT, BASE_CASE_HISTORY } from '@/lib/base-case'
 import { BASE_CASE_MODEL_ID } from '@/lib/models'
+import { SAMPLE_CONFIGS } from '@/lib/sample-configs'
 import TabBar from '@/components/TabBar'
 import ConfigPanel from '@/components/ConfigPanel'
 import ChatPanel from '@/components/ChatPanel'
@@ -31,6 +32,9 @@ export default function SimulatorPage() {
   const [mounted, setMounted] = useState(false)
   const [configOpen, setConfigOpen] = useState(false)
   const [instructionsOpen, setInstructionsOpen] = useState(false)
+  const [solutionModalOpen, setSolutionModalOpen] = useState(false)
+  const [solutionPassword, setSolutionPassword] = useState('')
+  const [solutionError, setSolutionError] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -109,6 +113,32 @@ export default function SimulatorPage() {
 
   function renameTab(id: string, name: string) {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, name } : t)))
+  }
+
+  function loadSolutionTabs() {
+    const solutionTabs: Tab[] = SAMPLE_CONFIGS.map((config) => ({
+      id: generateId(),
+      name: config.name,
+      systemPrompt: config.systemPrompt,
+      modelId: config.modelId,
+      messages: [],
+      isBaseCase: false,
+    }))
+    setTabs([BASE_CASE_TAB, ...solutionTabs])
+    setActiveTabId(solutionTabs[0].id)
+    setSolutionModalOpen(false)
+    setSolutionPassword('')
+    setSolutionError(false)
+  }
+
+  function handleSolutionSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (solutionPassword === 'OpsFTW') {
+      loadSolutionTabs()
+    } else {
+      setSolutionError(true)
+      setSolutionPassword('')
+    }
   }
 
   function updateTab(updates: Partial<Tab>) {
@@ -247,6 +277,7 @@ export default function SimulatorPage() {
         onDeleteTab={deleteTab}
         onRenameTab={renameTab}
         onOpenInstructions={() => setInstructionsOpen(true)}
+        onOpenSolution={() => { setSolutionModalOpen(true); setSolutionError(false); setSolutionPassword('') }}
       />
 
       {instructionsOpen && (
@@ -294,6 +325,64 @@ export default function SimulatorPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {solutionModalOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-swiss-ink/50 z-50"
+            onClick={() => setSolutionModalOpen(false)}
+          />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white border-2 border-swiss-ink shadow-[8px_8px_0_0_rgba(12,12,12,0.18)] w-[calc(100vw-2rem)] max-w-sm">
+            <div className="flex items-stretch border-b-2 border-swiss-ink">
+              <div className="w-2 bg-swiss-orange shrink-0" aria-hidden />
+              <div className="flex flex-1 items-center gap-3 px-4 py-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-swiss-ink bg-swiss-orange/10">
+                  <svg className="h-5 w-5 text-swiss-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-swiss-sage">Instructor access</p>
+                  <h2 className="text-base font-bold uppercase tracking-wide text-swiss-ink">Solution view</h2>
+                </div>
+                <button
+                  onClick={() => setSolutionModalOpen(false)}
+                  className="shrink-0 w-9 h-9 flex items-center justify-center border-2 border-swiss-ink bg-white hover:bg-swiss-ink hover:text-white transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="px-5 py-5">
+              <p className="text-sm text-neutral-600 mb-4 leading-relaxed">
+                Loads all 6 reference configurations as pre-built tabs — one per lesson concept. Existing variation tabs will be replaced.
+              </p>
+              <form onSubmit={handleSolutionSubmit} className="flex gap-2">
+                <input
+                  type="password"
+                  value={solutionPassword}
+                  onChange={(e) => { setSolutionPassword(e.target.value); setSolutionError(false) }}
+                  placeholder="Instructor password"
+                  autoFocus
+                  className="flex-1 text-sm border-2 border-swiss-ink px-3 py-2.5 focus:outline-none focus:border-swiss-blue bg-white placeholder:text-neutral-400"
+                />
+                <button
+                  type="submit"
+                  disabled={!solutionPassword}
+                  className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-orange bg-swiss-orange text-white px-3 py-2.5 hover:bg-swiss-orange/80 transition-colors disabled:opacity-40"
+                >
+                  Load
+                </button>
+              </form>
+              {solutionError && (
+                <p className="text-xs text-red-600 font-medium mt-2">Incorrect password.</p>
+              )}
             </div>
           </div>
         </>

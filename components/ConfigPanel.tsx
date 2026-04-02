@@ -5,11 +5,8 @@ import { Tab } from '@/lib/types'
 import { BASE_CASE_SYSTEM_PROMPT } from '@/lib/base-case'
 import { COMPANY_CONTEXT, resolveContextForRequest } from '@/lib/company-context'
 import { MODELS } from '@/lib/models'
-import { SAMPLE_CONFIGS, SampleConfig } from '@/lib/sample-configs'
 import ModelSelector from './ModelSelector'
 import SimulatorTipRotator from './SimulatorTipRotator'
-
-const INSTRUCTOR_PASSWORD = 'OpsFTW'
 
 interface ConfigPanelProps {
   tab: Tab
@@ -143,141 +140,10 @@ function ContextDocOpenBody({ tab, onUpdateTab }: ConfigPanelProps) {
   )
 }
 
-function InstructorPanel({
-  tab,
-  onUpdateTab,
-}: {
-  tab: Tab
-  onUpdateTab: (updates: Partial<Tab>) => void
-}) {
-  const [password, setPassword] = useState('')
-  const [authenticated, setAuthenticated] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('pgpf_instructor') === 'true'
-    }
-    return false
-  })
-  const [error, setError] = useState(false)
-  const [loadedConfigId, setLoadedConfigId] = useState<string | null>(null)
-
-  function handleAuth(e: React.FormEvent) {
-    e.preventDefault()
-    if (password === INSTRUCTOR_PASSWORD) {
-      sessionStorage.setItem('pgpf_instructor', 'true')
-      setAuthenticated(true)
-      setError(false)
-    } else {
-      setError(true)
-      setPassword('')
-    }
-  }
-
-  function loadSampleConfig(config: SampleConfig) {
-    onUpdateTab({ systemPrompt: config.systemPrompt, modelId: config.modelId })
-    setLoadedConfigId(config.id)
-  }
-
-  if (!authenticated) {
-    return (
-      <div className="pb-4">
-        <p className="text-xs text-neutral-500 mb-3 leading-relaxed">
-          Instructor tools include reference configurations that show optimized solutions. Not for student use.
-        </p>
-        <form onSubmit={handleAuth} className="flex gap-2">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(false) }}
-            placeholder="Instructor password"
-            className="flex-1 text-sm border-2 border-swiss-ink px-3 py-2 focus:outline-none focus:border-swiss-blue bg-white placeholder:text-neutral-400"
-          />
-          <button
-            type="submit"
-            disabled={!password}
-            className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-3 py-2 bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue transition-colors disabled:opacity-40"
-          >
-            Unlock
-          </button>
-        </form>
-        {error && (
-          <p className="text-xs text-red-600 font-medium mt-2">Incorrect password.</p>
-        )}
-      </div>
-    )
-  }
-
-  return (
-    <div className="pb-4">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-neutral-500 leading-relaxed">
-          Load a reference configuration to demo during class. Each illustrates a specific concept.
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            sessionStorage.removeItem('pgpf_instructor')
-            setAuthenticated(false)
-          }}
-          className="shrink-0 ml-3 text-[10px] font-bold uppercase tracking-wider text-neutral-400 hover:text-neutral-700 transition-colors"
-        >
-          Lock
-        </button>
-      </div>
-      <div className="space-y-2">
-        {SAMPLE_CONFIGS.map((config, index) => {
-          const model = MODELS.find(m => m.id === config.modelId)
-          const isLoaded = loadedConfigId === config.id
-          return (
-            <div
-              key={config.id}
-              className={`border-2 p-3 transition-colors ${isLoaded ? 'border-swiss-blue bg-swiss-blue/5' : 'border-neutral-200 bg-swiss-beige/20'}`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-[10px] font-mono font-bold text-neutral-400 shrink-0">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <p className="text-sm font-bold text-swiss-ink truncate">{config.name}</p>
-                    {isLoaded && (
-                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-swiss-blue border border-swiss-blue px-1.5 py-0.5">
-                        Loaded
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-neutral-500 leading-snug mb-2">{config.lesson}</p>
-                  {model && (
-                    <span className="inline-block text-[10px] font-mono font-bold uppercase tracking-wider border border-neutral-300 px-1.5 py-0.5 text-neutral-600 bg-white">
-                      {model.name} &middot; {model.pricePer1M < 0.10 ? `$${model.pricePer1M.toFixed(3)}` : `$${model.pricePer1M.toFixed(2)}`}/1M
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => loadSampleConfig(config)}
-                  className={`shrink-0 text-xs font-bold uppercase tracking-wider border-2 px-2 py-1.5 transition-colors ${
-                    isLoaded
-                      ? 'border-swiss-blue text-swiss-blue bg-swiss-blue/5 cursor-default'
-                      : 'border-swiss-ink bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue'
-                  }`}
-                  disabled={isLoaded}
-                >
-                  {isLoaded ? 'Active' : 'Load'}
-                </button>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
   const [contextOpen, setContextOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(false)
   const [modelOpen, setModelOpen] = useState(false)
-  const [instructorOpen, setInstructorOpen] = useState(false)
 
   const selectedModel = MODELS.find(m => m.id === tab.modelId)
   const promptText = tab.isBaseCase ? BASE_CASE_SYSTEM_PROMPT : tab.systemPrompt
@@ -287,6 +153,7 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
     : resolveContextForRequest(tab.companyContext).length
 
   return (
+
     <div className="h-full flex flex-col border-l-4 border-swiss-orange bg-white">
       <div className="px-4 py-4 border-b-2 border-swiss-ink bg-swiss-beige/30 flex-shrink-0">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-swiss-sage mb-1">Controls</p>
@@ -389,24 +256,6 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
               <ContextDocOpenBody key={tab.id} tab={tab} onUpdateTab={onUpdateTab} />
             )}
           </section>
-
-          {!tab.isBaseCase && (
-            <section className="py-1">
-              <SectionHeader
-                icon={
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                }
-                title="Instructor tools"
-                open={instructorOpen}
-                onClick={() => setInstructorOpen(v => !v)}
-              />
-              {instructorOpen && (
-                <InstructorPanel tab={tab} onUpdateTab={onUpdateTab} />
-              )}
-            </section>
-          )}
 
         </div>
       </div>
