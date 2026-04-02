@@ -335,12 +335,6 @@ export default function SimulatorPage() {
           />
         </div>
       </div>
-
-      <footer className="shrink-0 border-t border-swiss-ink/20 bg-white/80 px-4 py-2">
-        <p className="text-center text-[10px] sm:text-xs text-neutral-500 m-0">
-          Copyright Overclock Accelerator {new Date().getFullYear()}
-        </p>
-      </footer>
     </div>
   )
 }

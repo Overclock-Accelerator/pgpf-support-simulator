@@ -241,9 +241,14 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
               </svg>
             </button>
           </div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mt-2 px-1">
-            Enter to send · Shift+Enter new line
-          </p>
+          <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between px-1 min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 m-0 min-w-0">
+              Enter to send · Shift+Enter new line
+            </p>
+            <p className="text-[10px] text-neutral-400 m-0 sm:text-right sm:shrink-0 sm:self-end leading-tight">
+              Copyright Overclock Accelerator {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       )}
     </div>
