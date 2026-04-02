@@ -8,19 +8,10 @@ import { BASE_CASE_MODEL_ID } from '@/lib/models'
 import TabBar from '@/components/TabBar'
 import ConfigPanel from '@/components/ConfigPanel'
 import ChatPanel from '@/components/ChatPanel'
+import ExerciseInstructions from '@/components/ExerciseInstructions'
 
 function generateId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36)
-}
-
-const INSTRUCTIONS_TAB: Tab = {
-  id: 'instructions',
-  name: 'Instructions',
-  systemPrompt: '',
-  modelId: BASE_CASE_MODEL_ID,
-  messages: [],
-  isBaseCase: false,
-  isInstructions: true,
 }
 
 const BASE_CASE_TAB: Tab = {
@@ -34,11 +25,12 @@ const BASE_CASE_TAB: Tab = {
 
 export default function SimulatorPage() {
   const router = useRouter()
-  const [tabs, setTabs] = useState<Tab[]>([INSTRUCTIONS_TAB, BASE_CASE_TAB])
-  const [activeTabId, setActiveTabId] = useState<string>('instructions')
+  const [tabs, setTabs] = useState<Tab[]>([BASE_CASE_TAB])
+  const [activeTabId, setActiveTabId] = useState<string>('base-case')
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [configOpen, setConfigOpen] = useState(false)
+  const [instructionsOpen, setInstructionsOpen] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -50,14 +42,10 @@ export default function SimulatorPage() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Tab[]
-        const variationsOnly = parsed.filter((t) => !t.isBaseCase && !t.isInstructions)
-        setTabs([INSTRUCTIONS_TAB, BASE_CASE_TAB, ...variationsOnly])
+        const variationsOnly = parsed.filter((t) => !t.isBaseCase)
+        setTabs([BASE_CASE_TAB, ...variationsOnly])
         const savedActiveId = localStorage.getItem('pgpf_active_tab')
-        const restorableIds = new Set([
-          'instructions',
-          'base-case',
-          ...variationsOnly.map((t) => t.id),
-        ])
+        const restorableIds = new Set(['base-case', ...variationsOnly.map((t) => t.id)])
         if (savedActiveId && restorableIds.has(savedActiveId)) {
           setActiveTabId(savedActiveId)
         }
@@ -65,15 +53,22 @@ export default function SimulatorPage() {
         // ignore parse errors
       }
     }
+    const seenInstructions = localStorage.getItem('pgpf_seen_instructions')
+    if (!seenInstructions) setInstructionsOpen(true)
     setMounted(true)
   }, [router])
 
   useEffect(() => {
     if (!mounted) return
-    const persisted = tabs.filter((t) => !t.isBaseCase && !t.isInstructions)
+    const persisted = tabs.filter((t) => !t.isBaseCase)
     localStorage.setItem('pgpf_tabs', JSON.stringify(persisted))
     localStorage.setItem('pgpf_active_tab', activeTabId)
   }, [tabs, activeTabId, mounted])
+
+  function closeInstructions() {
+    setInstructionsOpen(false)
+    localStorage.setItem('pgpf_seen_instructions', 'true')
+  }
 
   useEffect(() => {
     function handleClear(e: Event) {
@@ -91,7 +86,7 @@ export default function SimulatorPage() {
   function addTab() {
     const newTab: Tab = {
       id: generateId(),
-      name: `Variation ${tabs.filter((t) => !t.isBaseCase && !t.isInstructions).length + 1}`,
+      name: `Variation ${tabs.filter((t) => !t.isBaseCase).length + 1}`,
       systemPrompt: BASE_CASE_SYSTEM_PROMPT,
       modelId: BASE_CASE_MODEL_ID,
       messages: [],
@@ -102,11 +97,11 @@ export default function SimulatorPage() {
   }
 
   function deleteTab(id: string) {
-    if (id === 'instructions' || id === 'base-case') return
+    if (id === 'base-case') return
     setTabs((prev) => {
       const filtered = prev.filter((t) => t.id !== id)
       if (activeTabId === id) {
-        setActiveTabId(filtered[filtered.length - 1]?.id ?? 'instructions')
+        setActiveTabId(filtered[filtered.length - 1]?.id ?? 'base-case')
       }
       return filtered
     })
@@ -124,7 +119,7 @@ export default function SimulatorPage() {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!activeTab || activeTab.isBaseCase || activeTab.isInstructions) return
+      if (!activeTab || activeTab.isBaseCase) return
 
       const userMessage: Message = {
         id: generateId(),
@@ -225,7 +220,7 @@ export default function SimulatorPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => setConfigOpen((v) => !v)}
               className="lg:hidden flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-swiss-ink border-2 border-swiss-ink px-3 py-2 bg-white hover:bg-swiss-beige/50 transition-colors"
@@ -234,11 +229,11 @@ export default function SimulatorPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Config
+              <span className="hidden sm:inline">Config</span>
             </button>
 
-            <span className="hidden sm:inline text-right text-xs text-neutral-600 italic leading-snug max-w-[11rem] md:max-w-[16rem] lg:max-w-md shrink-0">
-              &ldquo;If your pets ate it... It must have been &lsquo;Pretty Good!&rsquo;&rdquo;
+            <span className="hidden lg:inline text-right text-xs text-neutral-600 italic leading-snug whitespace-nowrap shrink-0">
+              &ldquo;Look, if your pet ate it&hellip; then it must have been Pretty Good!&rdquo;
             </span>
           </div>
         </div>
@@ -251,7 +246,58 @@ export default function SimulatorPage() {
         onAddTab={addTab}
         onDeleteTab={deleteTab}
         onRenameTab={renameTab}
+        onOpenInstructions={() => setInstructionsOpen(true)}
       />
+
+      {instructionsOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-swiss-ink/50 z-50"
+            onClick={closeInstructions}
+          />
+          <div className="fixed top-8 sm:top-14 left-1/2 -translate-x-1/2 z-50 flex flex-col bg-white border-2 border-swiss-ink shadow-[8px_8px_0_0_rgba(12,12,12,0.18)] w-[calc(100vw-2rem)] max-w-[600px] max-h-[calc(100vh-5rem)]">
+            <div className="flex items-stretch border-b-2 border-swiss-ink shrink-0">
+              <div className="w-2 bg-swiss-blue shrink-0" aria-hidden />
+              <div className="flex flex-1 items-center gap-4 px-4 sm:px-6 py-4 min-w-0">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-swiss-ink bg-swiss-blue/15">
+                  <svg className="h-5 w-5 text-swiss-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-swiss-sage">Exercise brief · read-only</p>
+                  <h2 className="mt-0.5 text-lg font-bold uppercase tracking-wide text-swiss-ink sm:text-xl">
+                    How to use this simulator
+                  </h2>
+                </div>
+                <button
+                  onClick={closeInstructions}
+                  className="ml-2 shrink-0 w-10 h-10 flex items-center justify-center border-2 border-swiss-ink bg-white hover:bg-swiss-ink hover:text-white transition-colors"
+                  aria-label="Close instructions"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8">
+              <ExerciseInstructions />
+            </div>
+            <div className="shrink-0 border-t-2 border-swiss-ink px-4 sm:px-8 py-4 flex justify-end bg-swiss-beige/30">
+              <button
+                onClick={closeInstructions}
+                className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider bg-swiss-blue text-white border-2 border-swiss-blue px-5 py-2.5 hover:bg-swiss-ink hover:border-swiss-ink transition-colors"
+              >
+                Got it — show the simulator
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="flex flex-1 overflow-hidden relative">
         <div className="hidden lg:flex lg:flex-col w-[22rem] xl:w-96 border-r-2 border-swiss-ink overflow-y-auto flex-shrink-0 bg-white">
@@ -289,6 +335,12 @@ export default function SimulatorPage() {
           />
         </div>
       </div>
+
+      <footer className="shrink-0 border-t border-swiss-ink/20 bg-white/80 px-4 py-2">
+        <p className="text-center text-[10px] sm:text-xs text-neutral-500 m-0">
+          Copyright Overclock Accelerator {new Date().getFullYear()}
+        </p>
+      </footer>
     </div>
   )
 }

@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { SIMULATOR_TIPS, SIMULATOR_TIP_COUNT } from '@/lib/simulator-tips'
+import {
+  SIMULATOR_TIPS_DISPLAY,
+  SIMULATOR_TIP_COUNT,
+} from '@/lib/simulator-tips'
 
 /** How long each tip stays visible before auto-advancing */
 const TIP_DISPLAY_MS = 18_000
@@ -72,7 +75,7 @@ export default function SimulatorTipRotator() {
           key={index}
           className="pgpf-simulator-tip-body text-sm leading-relaxed text-swiss-ink"
         >
-          {SIMULATOR_TIPS[index]}
+          {SIMULATOR_TIPS_DISPLAY[index]}
         </p>
       </div>
     </div>

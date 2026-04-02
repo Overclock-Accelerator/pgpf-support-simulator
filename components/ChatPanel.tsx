@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom'
 import { Tab, Message } from '@/lib/types'
 import { MODELS } from '@/lib/models'
 import { resolveContextForRequest } from '@/lib/company-context'
-import ExerciseInstructions from '@/components/ExerciseInstructions'
 
 interface ChatPanelProps {
   tab: Tab
@@ -28,12 +27,12 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
   const botName = selectedModel?.name ?? 'AI'
 
   useEffect(() => {
-    if (tab.isBaseCase || tab.isInstructions) {
+    if (tab.isBaseCase) {
       messagesScrollRef.current?.scrollTo({ top: 0, behavior: 'auto' })
       return
     }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [tab.isBaseCase, tab.isInstructions, tab.id, tab.messages, isLoading])
+  }, [tab.isBaseCase, tab.id, tab.messages, isLoading])
 
   function handleSend() {
     const trimmed = input.trim()
@@ -71,7 +70,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
       `Model: ${tab.modelId}`,
       `System Prompt: ${tab.systemPrompt}`,
     ]
-    if (!tab.isBaseCase && !tab.isInstructions) {
+    if (!tab.isBaseCase) {
       lines.push('============================')
       lines.push('COMPANY CONTEXT (effective for API):')
       lines.push(resolveContextForRequest(tab.companyContext))
@@ -91,28 +90,10 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
   }
 
   return (
-    <div className="flex flex-col h-full bg-white border-2 border-swiss-ink m-2 sm:m-3 shadow-[6px_6px_0_0_rgba(12,12,12,0.12)] min-h-0">
+    <div className="flex flex-col h-full min-h-0 bg-white border-2 border-swiss-ink m-2 sm:m-3 shadow-[6px_6px_0_0_rgba(12,12,12,0.12)]">
       <div className="flex items-stretch border-b-2 border-swiss-ink shrink-0">
         <div className="w-2 bg-swiss-blue shrink-0" aria-hidden />
-        {tab.isInstructions ? (
-          <div className="flex flex-1 items-start gap-4 px-4 sm:px-5 py-4 min-w-0">
-            <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center border-2 border-swiss-ink bg-swiss-blue/15">
-              <svg className="h-5 w-5 text-swiss-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-swiss-sage">Exercise brief · read-only</p>
-              <h2 className="mt-1 text-lg font-bold uppercase tracking-wide text-swiss-ink sm:text-xl">
-                How to use this simulator
-              </h2>
-              <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
-                Scroll the panel below for the full scenario, steps, and challenge. Switch to <strong className="text-swiss-ink">Base Case</strong>{' '}
-                when you are ready to study the benchmark chat.
-              </p>
-            </div>
-          </div>
-        ) : tab.isBaseCase ? (
+        {tab.isBaseCase ? (
           <div className="flex flex-1 items-start gap-4 px-4 sm:px-5 py-4 min-w-0">
             <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center border-2 border-swiss-ink bg-swiss-beige/50">
               <svg className="h-5 w-5 text-swiss-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,8 +106,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
                 Launch-week support transcripts
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-neutral-700">
-                Frozen thread from go-live week — the &ldquo;before&rdquo; picture. Open the <strong className="text-swiss-ink">Instructions</strong>{' '}
-                tab anytime for the exercise brief. Use the dashed <span className="font-mono font-bold text-swiss-ink">?</span> beside bot lines
+                Frozen thread from go-live week — the &ldquo;before&rdquo; picture. Use the dashed <span className="font-mono font-bold text-swiss-ink">?</span> beside bot lines
                 for facilitator coach notes (not part of the chat transcript).
               </p>
             </div>
@@ -180,13 +160,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
         ref={messagesScrollRef}
         className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6 min-h-0 scrollbar-thin"
       >
-        {tab.isInstructions && (
-          <div className="px-1 pb-4">
-            <ExerciseInstructions />
-          </div>
-        )}
-
-        {tab.messages.length === 0 && !tab.isBaseCase && !tab.isInstructions && (
+        {tab.messages.length === 0 && !tab.isBaseCase && (
           <div className="flex flex-col items-center justify-center gap-5 text-center py-12 flex-1">
             <div className="w-16 h-16 border-2 border-swiss-ink bg-swiss-orange/10 flex items-center justify-center">
               <svg className="w-8 h-8 text-swiss-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,8 +191,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
           </div>
         )}
 
-        {!tab.isInstructions &&
-          tab.messages.map((msg: Message) => (
+        {tab.messages.map((msg: Message) => (
             <MessageBubble
               key={msg.id}
               msg={msg}
@@ -227,7 +200,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
             />
           ))}
 
-        {!tab.isInstructions && isLoading && (
+        {isLoading && (
           <div className="flex flex-col items-start gap-2">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 px-1">{botName}</p>
             <div className="border-2 border-swiss-ink bg-swiss-beige/40 px-5 py-4 flex items-center gap-2">
@@ -245,7 +218,7 @@ export default function ChatPanel({ tab, onSendMessage, isLoading }: ChatPanelPr
         <div ref={messagesEndRef} />
       </div>
 
-      {!tab.isBaseCase && !tab.isInstructions && (
+      {!tab.isBaseCase && (
         <div className="flex-shrink-0 border-t-2 border-swiss-ink bg-swiss-beige/30 px-4 py-4">
           <div className="flex items-end gap-3 border-2 border-swiss-ink bg-white px-4 py-3 focus-within:ring-2 focus-within:ring-swiss-blue/40 transition-all">
             <textarea
@@ -304,15 +277,19 @@ function computeCoachPopoverStyle(trigger: DOMRect): {
   return { top, left, width: maxW, transform }
 }
 
-function CoachHintPopout({
+function HintPopout({
   open,
-  coachHint,
+  hint,
+  headline,
+  variant,
   triggerRef,
   onPointerLeaveIntent,
   onPointerEnter,
 }: {
   open: boolean
-  coachHint: string
+  hint: string
+  headline?: string
+  variant: 'content' | 'perf'
   triggerRef: RefObject<HTMLButtonElement | null>
   onPointerLeaveIntent: () => void
   onPointerEnter: () => void
@@ -344,39 +321,134 @@ function CoachHintPopout({
 
   if (!open || typeof document === 'undefined') return null
 
+  const isPerf = variant === 'perf'
+
   return createPortal(
     <div
       data-coach-hint-panel
-      className="fixed z-[300] p-0"
-      style={{
-        top: style.top,
-        left: style.left,
-        width: style.width,
-        transform: style.transform,
-      }}
+      className="fixed z-[9999] p-0 isolate"
+      style={{ top: style.top, left: style.left, width: style.width, transform: style.transform }}
       role="tooltip"
       onMouseEnter={onPointerEnter}
       onMouseLeave={onPointerLeaveIntent}
     >
       <div
-        className="rounded-sm border-2 border-swiss-ink bg-gradient-to-b from-amber-100 via-amber-50 to-amber-100/90 text-swiss-ink overflow-hidden
+        className={`rounded-sm border-2 border-swiss-ink overflow-hidden
           shadow-[inset_0_1px_0_rgba(255,255,255,0.65),inset_0_-2px_0_rgba(12,12,12,0.06),4px_4px_0_0_#0c0c0c,12px_14px_28px_rgba(12,12,12,0.28)]
-          [transform:rotate(-0.35deg)]"
+          [transform:rotate(-0.35deg)]
+          ${isPerf
+            ? 'bg-gradient-to-b from-orange-50 via-amber-50 to-orange-50'
+            : 'bg-gradient-to-b from-amber-100 via-amber-50 to-amber-100'
+          }`}
       >
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b-2 border-swiss-ink/25 bg-swiss-blue/15 px-3 py-2">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-swiss-blue">
-            Facilitator note
+        <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 border-b-2 border-swiss-ink/20 px-3 py-2
+          ${isPerf ? 'bg-orange-200/50' : 'bg-swiss-blue/15'}`}>
+          <span className={`text-[10px] font-black uppercase tracking-[0.2em]
+            ${isPerf ? 'text-orange-700' : 'text-swiss-blue'}`}>
+            {isPerf ? 'Cost & speed' : 'Facilitator note'}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">
-            · not part of the chat transcript
-          </span>
+          {headline && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-swiss-ink/80">
+              · {headline}
+            </span>
+          )}
         </div>
         <p className="px-3.5 py-3.5 text-sm font-medium leading-relaxed text-swiss-ink/95">
-          {coachHint}
+          {hint}
         </p>
       </div>
     </div>,
     document.body
+  )
+}
+
+function HintButton({
+  hint,
+  headline,
+  variant,
+  ariaLabel,
+}: {
+  hint: string
+  headline?: string
+  variant: 'content' | 'perf'
+  ariaLabel: string
+}) {
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(false)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null }
+  }, [])
+
+  const scheduleClose = useCallback(() => {
+    cancelClose()
+    closeTimer.current = setTimeout(() => setOpen(false), HINT_CLOSE_MS)
+  }, [cancelClose])
+
+  const openHint = useCallback(() => { cancelClose(); setOpen(true) }, [cancelClose])
+
+  useEffect(() => () => cancelClose(), [cancelClose])
+
+  useEffect(() => {
+    if (!open) return
+    function onDocPointerDown(e: PointerEvent) {
+      const t = e.target as HTMLElement
+      if (btnRef.current?.contains(t)) return
+      if (t.closest('[data-coach-hint-panel]')) return
+      setOpen(false)
+    }
+    document.addEventListener('pointerdown', onDocPointerDown, true)
+    return () => document.removeEventListener('pointerdown', onDocPointerDown, true)
+  }, [open])
+
+  const isPerf = variant === 'perf'
+
+  return (
+    <>
+      <button
+        ref={btnRef}
+        type="button"
+        aria-label={ariaLabel}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        onMouseEnter={openHint}
+        onMouseLeave={scheduleClose}
+        onFocus={openHint}
+        onBlur={scheduleClose}
+        onPointerDown={(e) => { if (e.pointerType === 'touch') { cancelClose(); setOpen(true) } }}
+        className={`shrink-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed
+          focus:outline-none focus-visible:ring-2 cursor-help self-stretch
+          shadow-[2px_2px_0_0_rgba(12,12,12,0.12)]
+          ${isPerf
+            ? 'border-orange-400/70 bg-gradient-to-b from-orange-50 to-amber-100/60 px-1.5 py-1.5 min-w-[2.25rem] hover:from-orange-100 hover:to-amber-200/60 focus-visible:ring-orange-400'
+            : 'border-swiss-blue bg-gradient-to-b from-white to-swiss-beige/40 px-2 py-2 min-w-[2.75rem] min-h-[3rem] hover:from-amber-50 hover:to-amber-100/50 focus-visible:ring-swiss-blue'
+          }`}
+      >
+        {isPerf ? (
+          <>
+            <svg className="w-3.5 h-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-[8px] font-black uppercase tracking-wider text-orange-700/80">cost</span>
+          </>
+        ) : (
+          <>
+            <span className="text-lg font-black leading-none text-swiss-blue">?</span>
+            <span className="text-[9px] font-black uppercase tracking-wider text-swiss-ink/70">note</span>
+          </>
+        )}
+      </button>
+      <HintPopout
+        open={open}
+        hint={hint}
+        headline={headline}
+        variant={variant}
+        triggerRef={btnRef}
+        onPointerEnter={cancelClose}
+        onPointerLeaveIntent={scheduleClose}
+      />
+    </>
   )
 }
 
@@ -390,87 +462,38 @@ function MessageBubble({
   showCoachHints?: boolean
 }) {
   const isUser = msg.role === 'user'
-  const hint = showCoachHints && msg.coachHint
-  const tooltipId = `coach-hint-${msg.id}`
-  const hintBtnRef = useRef<HTMLButtonElement>(null)
-  const [hintOpen, setHintOpen] = useState(false)
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const cancelClose = useCallback(() => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current)
-      closeTimer.current = null
-    }
-  }, [])
-
-  const scheduleClose = useCallback(() => {
-    cancelClose()
-    closeTimer.current = setTimeout(() => setHintOpen(false), HINT_CLOSE_MS)
-  }, [cancelClose])
-
-  const openHint = useCallback(() => {
-    cancelClose()
-    setHintOpen(true)
-  }, [cancelClose])
-
-  useEffect(() => () => cancelClose(), [cancelClose])
-
-  useEffect(() => {
-    if (!hintOpen) return
-    function onDocPointerDown(e: PointerEvent) {
-      const t = e.target as HTMLElement
-      if (hintBtnRef.current?.contains(t)) return
-      if (t.closest('[data-coach-hint-panel]')) return
-      setHintOpen(false)
-    }
-    document.addEventListener('pointerdown', onDocPointerDown, true)
-    return () => document.removeEventListener('pointerdown', onDocPointerDown, true)
-  }, [hintOpen])
+  const hasContentHint = showCoachHints && !!msg.coachHint
+  const hasPerfHint = showCoachHints && !!msg.perfHint
 
   return (
     <div className={`flex flex-col gap-2 ${isUser ? 'items-end' : 'items-start'}`}>
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 px-1">
         {isUser ? 'You' : botName}
       </p>
-      {hint ? (
-        <>
-          <div className="flex max-w-[90%] sm:max-w-[80%] items-stretch gap-2">
-            <div className="min-w-0 flex-1 px-5 py-4 text-base whitespace-pre-wrap leading-relaxed border-2 bg-white text-swiss-ink border-neutral-300">
-              {msg.content}
-            </div>
-            <button
-              ref={hintBtnRef}
-              type="button"
-              id={tooltipId}
-              aria-label="Show facilitator note: what went wrong with this bot reply"
-              aria-expanded={hintOpen}
-              aria-haspopup="dialog"
-              onMouseEnter={openHint}
-              onMouseLeave={scheduleClose}
-              onFocus={openHint}
-              onBlur={scheduleClose}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'touch') {
-                  cancelClose()
-                  setHintOpen(true)
-                }
-              }}
-              className="shrink-0 flex flex-col items-center justify-center gap-0.5 border-2 border-dashed border-swiss-blue bg-gradient-to-b from-white to-swiss-beige/40 px-2 py-2 min-w-[2.75rem] min-h-[3rem] hover:from-amber-50 hover:to-amber-100/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-swiss-blue cursor-help self-stretch shadow-[2px_2px_0_0_rgba(12,12,12,0.12)]"
-            >
-              <span className="text-lg font-black leading-none text-swiss-blue">?</span>
-              <span className="text-[9px] font-black uppercase tracking-wider text-swiss-ink/70">
-                note
-              </span>
-            </button>
+      {hasContentHint || hasPerfHint ? (
+        <div className="flex max-w-[90%] sm:max-w-[80%] items-stretch gap-1.5">
+          <div className="min-w-0 flex-1 px-5 py-4 text-base whitespace-pre-wrap leading-relaxed border-2 bg-white text-swiss-ink border-neutral-300">
+            {msg.content}
           </div>
-          <CoachHintPopout
-            open={hintOpen}
-            coachHint={msg.coachHint ?? ''}
-            triggerRef={hintBtnRef}
-            onPointerEnter={cancelClose}
-            onPointerLeaveIntent={scheduleClose}
-          />
-        </>
+          <div className="flex flex-row gap-1.5 shrink-0 self-stretch">
+            {hasContentHint && (
+              <HintButton
+                hint={msg.coachHint ?? ''}
+                headline={msg.coachHeadline}
+                variant="content"
+                ariaLabel="Show facilitator note: what went wrong with this bot reply"
+              />
+            )}
+            {hasPerfHint && (
+              <HintButton
+                hint={msg.perfHint ?? ''}
+                headline={msg.perfHeadline}
+                variant="perf"
+                ariaLabel="Show cost and speed note for this reply"
+              />
+            )}
+          </div>
+        </div>
       ) : (
         <div
           className={`max-w-[90%] sm:max-w-[80%] px-5 py-4 text-base whitespace-pre-wrap leading-relaxed border-2 ${

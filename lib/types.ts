@@ -5,8 +5,14 @@ export interface Message {
   latencyMs?: number
   costUsd?: number
   timestamp: number
-  /** Base case: hover “coach” note for facilitators */
+  /** Base case: hover "coach" note for facilitators */
   coachHint?: string
+  /** Base case: short headline summarising the failure (shown in popout header) */
+  coachHeadline?: string
+  /** Base case: cost / speed / brevity teaching note */
+  perfHint?: string
+  /** Base case: short headline for the perf note */
+  perfHeadline?: string
 }
 
 export interface Tab {
@@ -16,8 +22,6 @@ export interface Tab {
   modelId: string
   messages: Message[]
   isBaseCase: boolean
-  /** Read-only exercise brief; not chat, not configurable */
-  isInstructions?: boolean
   /** Variation tabs: custom company context; omitted or blank uses default catalog */
   companyContext?: string
 }

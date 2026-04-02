@@ -145,31 +145,6 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
   const [promptOpen, setPromptOpen] = useState(false)
   const [modelOpen, setModelOpen] = useState(false)
 
-  if (tab.isInstructions) {
-    return (
-      <div className="h-full flex flex-col border-l-4 border-swiss-orange bg-white">
-        <div className="px-4 py-4 border-b-2 border-swiss-ink bg-swiss-beige/30 shrink-0">
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-swiss-sage mb-1">Controls</p>
-          <h2 className="text-lg font-bold uppercase tracking-wide text-swiss-ink">Configuration</h2>
-          <div className="mt-3 flex items-start gap-2 border-2 border-swiss-blue bg-swiss-blue/10 px-3 py-2">
-            <svg className="w-4 h-4 text-swiss-blue shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-sm font-medium text-swiss-ink leading-snug">
-              You are on the <strong>Instructions</strong> tab. Open a <strong>Variation</strong> tab to change model, system prompt, and company
-              context for live chat.
-            </p>
-          </div>
-        </div>
-        <div className="flex-1 px-4 py-4 text-sm text-neutral-600 leading-relaxed">
-          <strong className="text-swiss-ink">Base Case</strong> shows the locked benchmark (read-only). <strong className="text-swiss-ink">Variation</strong>{' '}
-          tabs are where you run experiments against that benchmark.
-        </div>
-        <SimulatorTipRotator />
-      </div>
-    )
-  }
-
   const selectedModel = MODELS.find(m => m.id === tab.modelId)
   const promptText = tab.isBaseCase ? BASE_CASE_SYSTEM_PROMPT : tab.systemPrompt
   const charCount = promptText.length

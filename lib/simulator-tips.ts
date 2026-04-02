@@ -1,4 +1,7 @@
-/** Rotating hints for the support simulator (cost, latency, prompts, context, test scenarios). */
+/**
+ * Rotating hints for the support simulator (cost, latency, prompts, context, test scenarios).
+ * Kept grouped by topic here for editing; `SIMULATOR_TIPS_DISPLAY` is a seeded shuffle for the UI.
+ */
 export const SIMULATOR_TIPS: readonly string[] = [
   'At about $0.06/1M vs $5/1M, one chat can be pennies on a budget model vs dollars on a flagship — multiply by volume before you commit.',
   'Your bill is not just “price per 1M” — every turn resends the full thread. Long conversations make even cheap models add up.',
@@ -22,4 +25,24 @@ export const SIMULATOR_TIPS: readonly string[] = [
   'Ask which competitor food to buy. A good prompt keeps answers on‑brand without endorsing other stores.',
 ] as const
 
-export const SIMULATOR_TIP_COUNT = SIMULATOR_TIPS.length
+/** Stable PRNG step for deterministic shuffle (same order on server + client). */
+function shuffleSeeded<T>(items: readonly T[], seed: number): T[] {
+  const arr = [...items]
+  let state = seed >>> 0
+  const next01 = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0
+    return state / 4294967296
+  }
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(next01() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
+/** Presentation order — interleaves topics so rotation does not feel chunked. */
+export const SIMULATOR_TIPS_DISPLAY: readonly string[] = Object.freeze(
+  shuffleSeeded(SIMULATOR_TIPS, 0x50475046),
+)
+
+export const SIMULATOR_TIP_COUNT = SIMULATOR_TIPS_DISPLAY.length

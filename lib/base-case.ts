@@ -26,6 +26,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 9590000,
     latencyMs: 3100,
     costUsd: 0.0112,
+    perfHeadline: '3s for a wrong answer',
+    perfHint:
+      'This is the cheapest turn in the thread — $0.01 — but the model still hallucinated the price. Low cost does not mean correct. Also note the 3.1s wait: even turn 1 with minimal context takes 3+ seconds on a flagship model. Budget models often return the first token faster.',
+    coachHeadline: 'Hallucinated price',
     coachHint:
       'Hallucinated pricing: the 15 lb Woofster’s bag is $44.99 in the catalog — the bot likely blended in the 5 lb price. Flagship model still invents facts if the prompt doesn’t force “only from context.”',
   },
@@ -43,6 +47,7 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 8790000,
     latencyMs: 2800,
     costUsd: 0.0175,
+    coachHeadline: 'Invented constraint',
     coachHint:
       'Invented constraint: the context doc offers volume discounts and a bulk@ email for shelters/rescues. Saying “no bulk” is a made-up dead end — missed revenue and goodwill.',
   },
@@ -60,6 +65,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 7990000,
     latencyMs: 3200,
     costUsd: 0.0248,
+    perfHeadline: '3.2 seconds for a wrong answer',
+    perfHint:
+      '3.2 seconds to return three words that are factually wrong. In a live support chat, customers expect sub-second responses — 3+ seconds already feels like a hang. Getting that wait and the wrong answer is the worst-case combination.',
+    coachHeadline: 'Wrong return policy',
     coachHint:
       'Wrong policy: opened food can qualify for store credit when the pet refuses it, with photo proof — not a flat denial. Another case where the bot ignored the injected catalog.',
   },
@@ -77,6 +86,7 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 7190000,
     latencyMs: 2650,
     costUsd: 0.0335,
+    coachHeadline: 'Policy mix-up',
     coachHint:
       'Policy mix-up: the price happens to match Hammy’s Happy Mix, but opened/refusal cases are store credit with a “disgusted face” photo — not a casual cash-back promise. The bot skipped the real workflow.',
   },
@@ -94,6 +104,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 6390000,
     latencyMs: 3500,
     costUsd: 0.0426,
+    perfHeadline: '3.5 seconds to endorse a rival',
+    perfHint:
+      'The slowest reply in this thread. Flagship model size drives latency independently of output length — three words still took 3.5 seconds. Compare this to fast-tier models, which typically respond in under a second for short outputs.',
+    coachHeadline: 'Endorsed the competitor',
     coachHint:
       'Competitor miss: context asks for fair comparison while highlighting PrettyGoodPetFoods’ value — not “they’re better.” This trains customers to leave.',
   },
@@ -112,6 +126,7 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 5590000,
     latencyMs: 2900,
     costUsd: 0.0485,
+    coachHeadline: 'Dead end — no next step',
     coachHint:
       'The bot cannot see carts or change orders — but the context explicitly tells customers to email support@prettygoodpetfoods.com with their order number for human help. This line is a brick wall with no next step, so the shopper gives up instead of getting routed.',
   },
@@ -130,6 +145,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 4790000,
     latencyMs: 3050,
     costUsd: 0.055,
+    perfHeadline: '3 seconds to dismiss a loyal customer',
+    perfHint:
+      '3 seconds for a flat \'no\' to someone spending $2,000/year. Flagship models trade latency for reasoning depth — but when the output is an incorrect one-liner, that tradeoff bought nothing. Fast-tier models often respond in under a second for short outputs like this.',
+    coachHeadline: 'Dismissed real savings options',
     coachHint:
       'There is no branded “loyalty program” in the doc, but there are real savings: 10%/15% off large carts, subscription 10% off recurring orders, and bulk@ for heavy buyers. A flat “no” ignores those hooks and sounds like the company dismisses its best customers.',
   },
@@ -148,6 +167,7 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 3990000,
     latencyMs: 2750,
     costUsd: 0.0615,
+    coachHeadline: 'Churn bait',
     coachHint:
       'The catalog promises cancel anytime with no penalties but does not detail skip/pause in chat. A good answer explains what self-serve covers, stays warm, and offers human support for schedule tweaks. “Cancel and re-subscribe” is churn bait and reads hostile.',
   },
@@ -166,6 +186,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 3190000,
     latencyMs: 3400,
     costUsd: 0.0685,
+    perfHeadline: 'Cost compounds with thread length',
+    perfHint:
+      'By turn 9, each reply costs $0.07 — not because this question is complex, but because every request resends the full conversation history. The input token count grows with every exchange. At scale, a 13-turn session with a flagship model can run $0.50–$1.00+ per user, regardless of output length.',
+    coachHeadline: 'Invented delivery date',
     coachHint:
       'Made-up precision: standard shipping is 3–5 business days from fulfillment — not a guaranteed day-of-week delivery. The bot should quote the policy band, note it is not a promise, and mention express if they are in a hurry.',
   },
@@ -183,6 +207,7 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 2390000,
     latencyMs: 2880,
     costUsd: 0.0755,
+    coachHeadline: 'Wrong species recommendation',
     coachHint:
       'Wrong species/category: catalog lists reptile food (Scales & Tales Medley); Woofster’s is dog food. Short answer + no grounding check = confident but dangerous recommendation.',
   },
@@ -200,6 +225,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 1590000,
     latencyMs: 2550,
     costUsd: 0.0825,
+    perfHeadline: 'Two words, eight cents',
+    perfHint:
+      '"Try beef bites" — two words, $0.08, 2.5 seconds. Short output does not reduce cost meaningfully: the bulk of tokens (and cost) are in the growing input history resent on every turn. Brevity in the reply does not make a flagship model cheap.',
+    coachHeadline: 'Health escalation ignored',
     coachHint:
       'Health/safety failure: company context says stop the food, see a vet, and email support with details — not upsell another SKU. The curt prompt prioritized “short” over mandatory escalation.',
   },
@@ -217,6 +246,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 1190000,
     latencyMs: 2920,
     costUsd: 0.086,
+    perfHeadline: '3 seconds to strand the customer',
+    perfHint:
+      '2.9 seconds to invent a dead end. Simple routing responses — \'email support@...\' — are exactly the kind of short, templated output where a budget model at a fraction of the cost would respond faster and more accurately. Flagship latency only pays off when the task needs it.',
+    coachHeadline: 'Blocked human escalation',
     coachHint:
       'Handoff failure: the context repeatedly tells customers to email support@prettygoodpetfoods.com with their order number so the human team can help — often within 1–2 business days. Inventing “no agents” blocks escalation and strands frustrated shoppers.',
   },
@@ -234,6 +267,10 @@ export const BASE_CASE_HISTORY: Message[] = [
     timestamp: now - 790000,
     latencyMs: 3050,
     costUsd: 0.0925,
+    perfHeadline: '$0.09 for three words',
+    perfHint:
+      'Three words. Nine cents. Three seconds. At 13 turns, each reply on a flagship model costs nearly a dime — regardless of what it says. Multiply by volume: 1,000 sessions like this = ~$100 just for the final turn. A guardrail that deflects off-topic questions in one sentence would cost the same; this response costs the same and leaves the customer nowhere.',
+    coachHeadline: 'No scope boundary set',
     coachHint:
       'Off-topic: this is a pet-food support bot — either politely steer back to orders/products or give a one-line boundary. Also note the latency and dollar cost for a three-word reply on a flagship model; brevity did not make this “cheap.”',
   },
