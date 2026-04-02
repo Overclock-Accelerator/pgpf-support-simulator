@@ -60,7 +60,7 @@ function SectionHeader({
   )
 }
 
-function ContextDocOpenBody({ tab, onUpdateTab }: ConfigPanelProps) {
+function ContextDocOpenBody({ tab, onUpdateTab, onExpand }: ConfigPanelProps & { onExpand: (content: string) => void }) {
   const contextFieldValue =
     tab.companyContext !== undefined ? tab.companyContext : COMPANY_CONTEXT
   const contextForClipboard = tab.isBaseCase
@@ -93,13 +93,16 @@ function ContextDocOpenBody({ tab, onUpdateTab }: ConfigPanelProps) {
         <>
           <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
             <p className="text-sm text-neutral-600 font-medium">Canonical catalog &middot; not editable</p>
-            <button
-              type="button"
-              onClick={copyCompanyContext}
-              className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-beige/50 transition-colors shrink-0"
-            >
-              {contextCopyLabel}
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button type="button" onClick={() => onExpand(COMPANY_CONTEXT)} className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue transition-colors">Expand</button>
+              <button
+                type="button"
+                onClick={copyCompanyContext}
+                className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-beige/50 transition-colors"
+              >
+                {contextCopyLabel}
+              </button>
+            </div>
           </div>
           <pre className="text-sm font-mono bg-swiss-beige/40 border-2 border-neutral-300 rounded-sm px-3 py-3 max-h-72 overflow-y-auto whitespace-pre-wrap wrap-break-word text-swiss-ink leading-relaxed scrollbar-thin">
             {COMPANY_CONTEXT}
@@ -112,6 +115,7 @@ function ContextDocOpenBody({ tab, onUpdateTab }: ConfigPanelProps) {
               Injected with every message &middot; leave empty to restore default catalog
             </p>
             <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" onClick={() => onExpand(resolveContextForRequest(tab.companyContext))} className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue transition-colors">Expand</button>
               <button
                 type="button"
                 onClick={copyCompanyContext}
@@ -144,6 +148,7 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
   const [contextOpen, setContextOpen] = useState(false)
   const [promptOpen, setPromptOpen] = useState(false)
   const [modelOpen, setModelOpen] = useState(false)
+  const [expandModal, setExpandModal] = useState<{ title: string; content: string } | null>(null)
 
   const selectedModel = MODELS.find(m => m.id === tab.modelId)
   const promptText = tab.isBaseCase ? BASE_CASE_SYSTEM_PROMPT : tab.systemPrompt
@@ -153,7 +158,28 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
     : resolveContextForRequest(tab.companyContext).length
 
   return (
-
+    <>
+    {expandModal && (
+      <>
+        <div className="fixed inset-0 bg-swiss-ink/60 z-50" onClick={() => setExpandModal(null)} />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col bg-white border-2 border-swiss-ink shadow-[8px_8px_0_0_rgba(12,12,12,0.18)] w-[calc(100vw-3rem)] max-w-3xl max-h-[80vh]">
+          <div className="flex items-center justify-between px-5 py-3 border-b-2 border-swiss-ink shrink-0 bg-swiss-beige/30">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-swiss-ink">{expandModal.title}</span>
+            <button
+              onClick={() => setExpandModal(null)}
+              className="w-9 h-9 flex items-center justify-center border-2 border-swiss-ink bg-white hover:bg-swiss-ink hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <pre className="flex-1 overflow-y-auto px-6 py-5 text-sm font-mono text-swiss-ink leading-relaxed whitespace-pre-wrap scrollbar-thin">
+            {expandModal.content}
+          </pre>
+        </div>
+      </>
+    )}
     <div className="h-full flex flex-col border-l-4 border-swiss-orange bg-white">
       <div className="px-4 py-4 border-b-2 border-swiss-ink bg-swiss-beige/30 flex-shrink-0">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-swiss-sage mb-1">Controls</p>
@@ -210,11 +236,14 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
               <div className="pb-4">
                 {tab.isBaseCase ? (
                   <>
-                    <div className="flex items-center gap-2 mb-2">
-                      <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <span className="text-sm text-neutral-600 font-medium">Locked for base case</span>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span className="text-sm text-neutral-600 font-medium">Locked for base case</span>
+                      </div>
+                      <button type="button" onClick={() => setExpandModal({ title: 'System Prompt', content: BASE_CASE_SYSTEM_PROMPT })} className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue transition-colors shrink-0">Expand</button>
                     </div>
                     <textarea
                       value={BASE_CASE_SYSTEM_PROMPT}
@@ -226,7 +255,10 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
                   <>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-neutral-600">Injected before every turn</span>
-                      <span className="text-xs font-mono font-bold text-neutral-500 border border-neutral-300 px-2 py-1">{charCount} chars</span>
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => setExpandModal({ title: 'System Prompt', content: tab.systemPrompt })} className="text-xs font-bold uppercase tracking-wider border-2 border-swiss-ink px-2 py-1 bg-white hover:bg-swiss-blue hover:text-white hover:border-swiss-blue transition-colors">Expand</button>
+                        <span className="text-xs font-mono font-bold text-neutral-500 border border-neutral-300 px-2 py-1">{charCount} chars</span>
+                      </div>
                     </div>
                     <textarea
                       value={tab.systemPrompt}
@@ -253,7 +285,7 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
               onClick={() => setContextOpen(v => !v)}
             />
             {contextOpen && (
-              <ContextDocOpenBody key={tab.id} tab={tab} onUpdateTab={onUpdateTab} />
+              <ContextDocOpenBody key={tab.id} tab={tab} onUpdateTab={onUpdateTab} onExpand={(content) => setExpandModal({ title: 'Context Document', content })} />
             )}
           </section>
 
@@ -262,5 +294,6 @@ export default function ConfigPanel({ tab, onUpdateTab }: ConfigPanelProps) {
 
       <SimulatorTipRotator />
     </div>
+    </>
   )
 }

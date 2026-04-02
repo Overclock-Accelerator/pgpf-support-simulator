@@ -35,6 +35,7 @@ export default function SimulatorPage() {
   const [solutionModalOpen, setSolutionModalOpen] = useState(false)
   const [solutionPassword, setSolutionPassword] = useState('')
   const [solutionError, setSolutionError] = useState(false)
+  const [populatingTabIds, setPopulatingTabIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -115,6 +116,46 @@ export default function SimulatorPage() {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, name } : t)))
   }
 
+  async function autoPopulateSolutionTab(tabId: string, systemPrompt: string, modelId: string) {
+    setPopulatingTabIds(prev => new Set(prev).add(tabId))
+    const userMessages = BASE_CASE_HISTORY.filter(m => m.role === 'user')
+    let history: Message[] = []
+
+    for (const userMsg of userMessages) {
+      const newUserMsg: Message = {
+        id: generateId(),
+        role: 'user',
+        content: userMsg.content,
+        timestamp: Date.now(),
+      }
+      history = [...history, newUserMsg]
+      setTabs(prev => prev.map(t => t.id === tabId ? { ...t, messages: history } : t))
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history, systemPrompt, modelId }),
+        })
+        const data = await res.json()
+        const assistantMsg: Message = {
+          id: generateId(),
+          role: 'assistant',
+          content: data.content,
+          latencyMs: data.latencyMs,
+          costUsd: data.costUsd,
+          timestamp: Date.now(),
+        }
+        history = [...history, assistantMsg]
+        setTabs(prev => prev.map(t => t.id === tabId ? { ...t, messages: history } : t))
+      } catch {
+        break
+      }
+    }
+
+    setPopulatingTabIds(prev => { const next = new Set(prev); next.delete(tabId); return next })
+  }
+
   function loadSolutionTabs() {
     const solutionTabs: Tab[] = SAMPLE_CONFIGS.map((config) => ({
       id: generateId(),
@@ -129,6 +170,7 @@ export default function SimulatorPage() {
     setSolutionModalOpen(false)
     setSolutionPassword('')
     setSolutionError(false)
+    solutionTabs.forEach(tab => autoPopulateSolutionTab(tab.id, tab.systemPrompt, tab.modelId))
   }
 
   function handleSolutionSubmit(e: React.FormEvent) {
@@ -420,7 +462,8 @@ export default function SimulatorPage() {
           <ChatPanel
             tab={activeTab}
             onSendMessage={sendMessage}
-            isLoading={isLoading}
+            isLoading={isLoading || populatingTabIds.has(activeTab.id)}
+            isPopulating={populatingTabIds.has(activeTab.id)}
           />
         </div>
       </div>
