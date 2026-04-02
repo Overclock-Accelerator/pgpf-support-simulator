@@ -225,7 +225,7 @@ export default function SimulatorPage() {
       <div className="flex flex-1 overflow-hidden relative">
         {/* Config panel — sidebar on desktop, overlay on mobile */}
         {/* Desktop sidebar — flex-1 so it shares space equally with chat */}
-        <div className="hidden lg:flex lg:flex-col lg:flex-1 lg:min-w-[340px] border-r border-gray-200/60 overflow-y-auto bg-white/80">
+        <div className="hidden lg:flex lg:flex-col w-96 border-r border-gray-200/60 overflow-y-auto bg-white/80 flex-shrink-0">
           <ConfigPanel tab={activeTab} onUpdateTab={updateTab} />
         </div>
         {/* Mobile overlay */}
@@ -253,7 +253,7 @@ export default function SimulatorPage() {
         )}
 
         {/* Chat area — narrower, max-width capped */}
-        <div className="flex-1 flex flex-col overflow-hidden lg:max-w-md xl:max-w-lg">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <ChatPanel
             tab={activeTab}
             onSendMessage={sendMessage}
