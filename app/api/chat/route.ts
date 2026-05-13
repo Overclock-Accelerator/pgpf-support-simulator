@@ -11,6 +11,19 @@ function getModelName(modelId: string): string {
   return modelId.split('/').slice(1).join('/')
 }
 
+// Maps UI model names (dot-notation) to actual API model IDs
+const ANTHROPIC_MODEL_MAP: Record<string, string> = {
+  'claude-haiku-4.5':  'claude-haiku-4-5-20251001',
+  'claude-sonnet-4.6': 'claude-sonnet-4-6',
+  'claude-opus-4.6':   'claude-opus-4-6',
+}
+
+const OPENAI_MODEL_MAP: Record<string, string> = {
+  'gpt-5.4-nano': 'gpt-4o-mini',
+  'gpt-5.4-mini': 'gpt-4o-mini',
+  'gpt-5.4':      'gpt-4o',
+}
+
 async function callAnthropic(modelName: string, systemPrompt: string, messages: ChatMessage[]) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -95,9 +108,11 @@ export async function POST(req: NextRequest) {
   let costUsd: number
 
   if (provider === 'anthropic') {
-    ;({ content, costUsd } = await callAnthropic(modelName, fullSystem, messages))
+    const resolvedModel = ANTHROPIC_MODEL_MAP[modelName] ?? modelName
+    ;({ content, costUsd } = await callAnthropic(resolvedModel, fullSystem, messages))
   } else if (provider === 'openai') {
-    ;({ content, costUsd } = await callOpenAI(modelName, fullSystem, messages))
+    const resolvedModel = OPENAI_MODEL_MAP[modelName] ?? modelName
+    ;({ content, costUsd } = await callOpenAI(resolvedModel, fullSystem, messages))
   } else {
     ;({ content, costUsd } = await callOpenRouter(modelId, fullSystem, messages))
   }
