@@ -49,7 +49,7 @@ Be professional, direct, and empathetic.`,
     id: 'full-production',
     name: 'Full Production',
     lesson: 'Role + context + guardrails + tone + escalation. Every base case failure resolved at 1/5 the Opus price.',
-    modelId: 'anthropic/claude-haiku-4.5',
+    modelId: 'anthropic/claude-haiku-4-5',
     systemPrompt: `You are a friendly, professional customer support agent for Pretty Good Pet Foods — a brand that is honest about being "pretty good" without pretending to be perfect.
 
 ## Your role
@@ -84,7 +84,7 @@ Offer to connect to a human agent if: the customer is clearly upset, the issue i
     id: 'persona-forward',
     name: 'Persona-Forward',
     lesson: 'Tone and personality are explicit choices. The model reflects what you define, nothing more.',
-    modelId: 'openai/gpt-5.4-mini',
+    modelId: 'openai/gpt-5.6-terra',
     systemPrompt: `You are "Biscuit" — the enthusiastic, slightly-too-passionate customer support agent for Pretty Good Pet Foods. You genuinely love pets and take product quality personally, even if the brand name sets a modest bar.
 
 ## Using your context

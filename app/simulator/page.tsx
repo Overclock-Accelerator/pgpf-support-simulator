@@ -6,6 +6,7 @@ import { Tab, Message } from '@/lib/types'
 import { BASE_CASE_SYSTEM_PROMPT, BASE_CASE_HISTORY } from '@/lib/base-case'
 import { BASE_CASE_MODEL_ID } from '@/lib/models'
 import { SAMPLE_CONFIGS } from '@/lib/sample-configs'
+import { PRELOADED_SOLUTIONS } from '@/lib/preloaded-solutions'
 import TabBar from '@/components/TabBar'
 import ConfigPanel from '@/components/ConfigPanel'
 import ChatPanel from '@/components/ChatPanel'
@@ -35,7 +36,7 @@ export default function SimulatorPage() {
   const [solutionModalOpen, setSolutionModalOpen] = useState(false)
   const [solutionPassword, setSolutionPassword] = useState('')
   const [solutionError, setSolutionError] = useState(false)
-  const [populatingTabIds, setPopulatingTabIds] = useState<Set<string>>(new Set())
+  const [solutionLoadError, setSolutionLoadError] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -116,47 +117,25 @@ export default function SimulatorPage() {
     setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, name } : t)))
   }
 
-  async function autoPopulateSolutionTab(tabId: string, systemPrompt: string, modelId: string) {
-    setPopulatingTabIds(prev => new Set(prev).add(tabId))
-    const userMessages = BASE_CASE_HISTORY.filter(m => m.role === 'user')
-    let history: Message[] = []
-
-    for (const userMsg of userMessages) {
-      const newUserMsg: Message = {
-        id: generateId(),
-        role: 'user',
-        content: userMsg.content,
-        timestamp: Date.now(),
-      }
-      history = [...history, newUserMsg]
-      setTabs(prev => prev.map(t => t.id === tabId ? { ...t, messages: history } : t))
-
-      try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history, systemPrompt, modelId }),
-        })
-        const data = await res.json()
-        const assistantMsg: Message = {
-          id: generateId(),
-          role: 'assistant',
-          content: data.content,
-          latencyMs: data.latencyMs,
-          costUsd: data.costUsd,
-          timestamp: Date.now(),
-        }
-        history = [...history, assistantMsg]
-        setTabs(prev => prev.map(t => t.id === tabId ? { ...t, messages: history } : t))
-      } catch {
-        break
-      }
+  function loadSolutionTabs() {
+    // Solution transcripts are pre-generated and committed (lib/preloaded-solutions.ts)
+    // so this path makes zero /api/chat calls. If the file has not been generated,
+    // tell the operator to run the generator — never fall back to live calls here.
+    const complete =
+      PRELOADED_SOLUTIONS.length > 0 &&
+      SAMPLE_CONFIGS.every((config) =>
+        PRELOADED_SOLUTIONS.some(
+          (s) => s.configId === config.id && s.messages.filter((m) => m.role === 'user').length ===
+            BASE_CASE_HISTORY.filter((m) => m.role === 'user').length
+        )
+      )
+    if (!complete) {
+      setSolutionLoadError(
+        'Preloaded solution transcripts are missing. Run `npm run generate-solutions`, commit the regenerated lib/preloaded-solutions.ts, and redeploy.'
+      )
+      return
     }
 
-    setPopulatingTabIds(prev => { const next = new Set(prev); next.delete(tabId); return next })
-  }
-
-  function loadSolutionTabs() {
     const solutionTabs: Tab[] = SAMPLE_CONFIGS.map((config) => ({
       id: generateId(),
       name: config.name,
@@ -170,7 +149,24 @@ export default function SimulatorPage() {
     setSolutionModalOpen(false)
     setSolutionPassword('')
     setSolutionError(false)
-    solutionTabs.forEach(tab => autoPopulateSolutionTab(tab.id, tab.systemPrompt, tab.modelId))
+    setSolutionLoadError(null)
+
+    // Local staggered reveal only — data comes from the committed preloaded file.
+    solutionTabs.forEach((tab, i) => {
+      setTimeout(() => {
+        const preloaded = PRELOADED_SOLUTIONS.find((s) => s.configId === SAMPLE_CONFIGS[i].id)
+        if (!preloaded) return
+        const messages: Message[] = preloaded.messages.map((m) => ({
+          id: generateId(),
+          role: m.role,
+          content: m.content,
+          latencyMs: m.latencyMs,
+          costUsd: m.costUsd,
+          timestamp: Date.now(),
+        }))
+        setTabs((prev) => prev.map((t) => (t.id === tab.id ? { ...t, messages } : t)))
+      }, 120 * i)
+    })
   }
 
   function handleSolutionSubmit(e: React.FormEvent) {
@@ -425,6 +421,9 @@ export default function SimulatorPage() {
               {solutionError && (
                 <p className="text-xs text-red-600 font-medium mt-2">Incorrect password.</p>
               )}
+              {solutionLoadError && (
+                <p className="text-xs text-red-600 font-medium mt-2 leading-relaxed">{solutionLoadError}</p>
+              )}
             </div>
           </div>
         </>
@@ -462,8 +461,7 @@ export default function SimulatorPage() {
           <ChatPanel
             tab={activeTab}
             onSendMessage={sendMessage}
-            isLoading={isLoading || populatingTabIds.has(activeTab.id)}
-            isPopulating={populatingTabIds.has(activeTab.id)}
+            isLoading={isLoading}
           />
         </div>
       </div>
