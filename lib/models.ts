@@ -13,12 +13,10 @@ export const MODELS: Model[] = [
   { id: 'anthropic/claude-haiku-4-5',  name: 'Claude Haiku 4.5',  provider: 'Anthropic',   tier: 'fast',     description: 'Fast & efficient',      pricePer1M: 1.00  },
   { id: 'anthropic/claude-sonnet-5',   name: 'Claude Sonnet 5',   provider: 'Anthropic',   tier: 'balanced', description: 'Balanced',              pricePer1M: 2.00  },
   { id: 'anthropic/claude-opus-5',     name: 'Claude Opus 5',     provider: 'Anthropic',   tier: 'premium',  description: 'Most capable',          pricePer1M: 5.00  },
-  { id: 'anthropic/claude-fable-5-1',  name: 'Claude Fable 5.1',  provider: 'Anthropic',   tier: 'premium',  description: 'Frontier reasoning',    pricePer1M: 10.00 },
   // OpenAI (direct)
   { id: 'openai/gpt-5.6-luna',         name: 'GPT-5.6 Luna',      provider: 'OpenAI',      tier: 'fast',     description: 'Fast & cheap',          pricePer1M: 0.20  },
   { id: 'openai/gpt-5.6-terra',        name: 'GPT-5.6 Terra',     provider: 'OpenAI',      tier: 'balanced', description: 'Balanced',              pricePer1M: 2.00  },
   { id: 'openai/gpt-5.6-sol',          name: 'GPT-5.6 Sol',       provider: 'OpenAI',      tier: 'premium',  description: 'GPT-5.6 flagship',      pricePer1M: 4.00  },
-  { id: 'openai/gpt-6-astra',          name: 'GPT-6 Astra',       provider: 'OpenAI',      tier: 'premium',  description: 'Frontier reasoning',    pricePer1M: 10.00 },
   // Chinese / Open Source (via OpenRouter)
   { id: 'deepseek/deepseek-v3.2',      name: 'DeepSeek V3.2',     provider: 'DeepSeek',    tier: 'balanced', description: 'Chinese open-source',   pricePer1M: 0.26  },
   { id: 'qwen/qwen3.5-flash-02-23',    name: 'Qwen 3.5 Flash',    provider: 'Qwen',        tier: 'fast',     description: 'Chinese open-source',   pricePer1M: 0.065 },

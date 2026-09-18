@@ -28,14 +28,12 @@ export const ANTHROPIC_MODEL_MAP: Record<string, string> = {
   'claude-haiku-4-5':  'claude-haiku-4-5',
   'claude-sonnet-5':   'claude-sonnet-5',
   'claude-opus-5':     'claude-opus-5',
-  'claude-fable-5-1':  'claude-fable-5-1',
 }
 
 export const OPENAI_MODEL_MAP: Record<string, string> = {
   'gpt-5.6-luna':  'gpt-5.6-luna',
   'gpt-5.6-terra': 'gpt-5.6-terra',
   'gpt-5.6-sol':   'gpt-5.6-sol',
-  'gpt-6-astra':   'gpt-6-astra',
 }
 
 export async function callAnthropic(modelName: string, systemPrompt: string, messages: ChatMessage[]) {

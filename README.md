@@ -52,12 +52,12 @@ The 6 reference configurations (transcripts are pre-generated — see "Preloaded
 
 ## Models Available
 
-14 models across 8 providers — selected to span a wide price and capability range:
+12 models across 8 providers — selected to span a wide price and capability range:
 
 | Provider | Models |
 |----------|--------|
-| Anthropic (direct) | Claude Haiku 4.5, Sonnet 5, Opus 5, Fable 5.1 |
-| OpenAI (direct) | GPT-5.6 Luna, Terra, Sol, GPT-6 Astra |
+| Anthropic (direct) | Claude Haiku 4.5, Sonnet 5, Opus 5 |
+| OpenAI (direct) | GPT-5.6 Luna, Terra, Sol |
 | DeepSeek | DeepSeek V3.2 |
 | Qwen | Qwen 3.5 Flash |
 | z.ai | GLM-4.7 Flash |
@@ -79,8 +79,8 @@ Anthropic and OpenAI models are called directly through their native APIs; all o
 Create `.env.local`:
 
 ```
-ANTHROPIC_API_KEY=your_key_here   # direct Anthropic models (Haiku 4.5, Sonnet 5, Opus 5, Fable 5.1)
-OPENAI_API_KEY=your_key_here      # direct OpenAI models (GPT-5.6 Luna/Terra/Sol, GPT-6 Astra)
+ANTHROPIC_API_KEY=your_key_here   # direct Anthropic models (Haiku 4.5, Sonnet 5, Opus 5)
+OPENAI_API_KEY=your_key_here      # direct OpenAI models (GPT-5.6 Luna/Terra/Sol)
 OPENROUTER_API_KEY=your_key_here  # only needed for the non-Anthropic/OpenAI roster
                                   # (DeepSeek, Qwen, z.ai, Moonshot, xAI, MiniMax)
 ```
